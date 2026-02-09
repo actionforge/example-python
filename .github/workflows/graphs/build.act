@@ -1,0 +1,59 @@
+entry: gh-start
+nodes:
+  - id: gh-start
+    type: core/gh-start@v1
+    position:
+      x: 10
+      y: 10
+  - id: checkout
+    type: github.com/actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+    position:
+      x: 430
+      y: 720
+  - id: setup-python
+    type: github.com/actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+    position:
+      x: 900
+      y: 640
+    inputs:
+      python-version: 3.x
+  - id: run
+    type: core/run@v1
+    position:
+      x: 1340
+      y: 530
+    inputs:
+      script: print("Hello, World!")
+      shell: python
+connections: []
+executions:
+  - src:
+      node: gh-start
+      port: exec-on_push
+    dst:
+      node: checkout
+      port: exec
+  - src:
+      node: gh-start
+      port: exec-on_pull_request
+    dst:
+      node: checkout
+      port: exec
+  - src:
+      node: gh-start
+      port: exec-on_workflow_dispatch
+    dst:
+      node: checkout
+      port: exec
+  - src:
+      node: checkout
+      port: exec-success
+    dst:
+      node: setup-python
+      port: exec
+  - src:
+      node: setup-python
+      port: exec-success
+    dst:
+      node: run
+      port: exec
